@@ -1,23 +1,107 @@
-![056131D4](https://github.com/Cvandia/nonebot_plugin_genshin_cos/assets/106718176/da116fce-d24f-4f89-8f6c-1f2509fd56be)
+<style>
+  .round-image-container {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    display: inline-block;
+    overflow: hidden;
+  }
+
+  .round-image {
+    border-radius: 50%;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+    border: 4px solid #ffffff;
+    transition: transform 0.3s ease-in-out;
+    transform: translateX(0);
+  }
+
+  .round-image:hover {
+    animation: roll-left 1s forwards;
+  }
+
+  .logo-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: transparent;
+    padding: 10px;
+    white-space: nowrap;
+    font-size: 20px;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+
+  .round-image-container:hover .logo-text {
+    opacity: 1;
+  }
+
+  @keyframes roll-left {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-200px);
+    }
+  }
+</style>
+
+<script>
+  const roundImage = document.querySelector('.round-image');
+
+  roundImage.addEventListener('mouseenter', () => {
+    roundImage.style.animationPlayState = 'running';
+  });
+
+  roundImage.addEventListener('mouseleave', () => {
+    roundImage.style.animationPlayState = 'paused';
+  });
+</script>
+
 <div align="center">
-
-<a href="https://v2.nonebot.dev/store"><img src="https://ghproxy.com/https://github.com/Cvandia/nonebot_plugin_genshin_cos/blob/main/res/ico.png" width="180" height="180" alt="NoneBotPluginLogo"></a>
-
+  <div class="round-image-container">
+    <a href="https://onebot.adapters.nonebot.dev">
+      <img src="./res/logo.png" width="180" height="180" alt="OnebotLogo" class="round-image">
+      <span class="logo-text">什么都没有</span>
+    </a>
+  </div>
 </div>
+
 
 <div align="center">
 
 # nonebot-plugin-fakemsg
 
-_⭐基于Nonebot2的一款获取米游社cos的插件⭐_
+_⭐基于`Nonebot2`的`onebot 11`的合并转发伪造消息插件⭐_
 
 
+<style>
+  .badge {
+    display: inline-block;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .badge:hover {
+    transform: scale(1.1);
+  }
+</style>
+
+<a href="https://www.python.org/downloads/release/python-390/" class="badge">
+<img src="https://img.shields.io/badge/python-3.8+-blue">
+</a>
+<a href="" class="badge">
+<img src="https://img.shields.io/badge/QQ-1141538825-yellow">
+</a>
+<a href="https://github.com/Cvandia/nonebot-plugin-fakemsg/blob/main/LICENSE" class="badge">
+<img src="https://img.shields.io/badge/license-MIT-blue">
+</a>
+<a href="https://v2.nonebot.dev/" class="badge">
+<img src="https://img.shields.io/badge/nonebot2-2.0.0+-red">
+</a>
+<a href="https://onebot.adapters.nonebot.dev" class="badge">
+<img src="https://img.shields.io/badge/Onebot%2011-2.2.4+-green">
+</a>
 </div>
-
-<div align="center">
-<a href="https://www.python.org/downloads/release/python-390/"><img src="https://img.shields.io/badge/python-3.8+-blue"></a>  <a href=""><img src="https://img.shields.io/badge/QQ-1141538825-yellow"></a> <a href="https://github.com/Cvandia/nonebot-plugin-fakemsg/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue"></a> <a href="https://v2.nonebot.dev/"><img src="https://img.shields.io/badge/nonebot2-2.0.0+-red"></a>
-</div>
-
 
 ## ⭐ 介绍
 
@@ -46,7 +130,7 @@ pip install nonebot-plugin-fakemsg
 nb-cli安装
 
 ```
-nb plugin install nonebot-plugin-fakemsg --upgrade
+nb plugin install nonebot-plugin-fakemsg -U
 ```
 
 git clone安装(不推荐)
@@ -54,7 +138,7 @@ git clone安装(不推荐)
 - 运行
 `git clone https://github.com/Cvandia/nonebot-plugin-fakemsg`
 - 在运行处
-把文件夹`nonebot_plugin_fakemsg`复制到bot根目录下的`src/plugins`(或者你创建bot时的其他名称`xxx/plugins`)
+把文件夹`nonebot-plugin-fakemsg`复制到bot根目录下的`src/plugins`(或者你创建bot时的其他名称`xxx/plugins`)
 
  
  </details>
