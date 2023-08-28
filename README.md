@@ -1,68 +1,7 @@
-<style>
-  .round-image-container {
-    position: relative;
-    width: 180px;
-    height: 180px;
-    display: inline-block;
-    overflow: hidden;
-  }
-
-  .round-image {
-    border-radius: 50%;
-    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
-    border: 4px solid #ffffff;
-    transition: transform 0.3s ease-in-out;
-    transform: translateX(0);
-  }
-
-  .round-image:hover {
-    animation: roll-left 1s forwards;
-  }
-
-  .logo-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: transparent;
-    padding: 10px;
-    white-space: nowrap;
-    font-size: 20px;
-    opacity: 0;
-    transition: opacity 0.5s;
-  }
-
-  .round-image-container:hover .logo-text {
-    opacity: 1;
-  }
-
-  @keyframes roll-left {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(-200px);
-    }
-  }
-</style>
-
-<script>
-  const roundImage = document.querySelector('.round-image');
-
-  roundImage.addEventListener('mouseenter', () => {
-    roundImage.style.animationPlayState = 'running';
-  });
-
-  roundImage.addEventListener('mouseleave', () => {
-    roundImage.style.animationPlayState = 'paused';
-  });
-</script>
 
 <div align="center">
-  <div class="round-image-container">
     <a href="https://onebot.adapters.nonebot.dev">
-      <img src="./res/logo.png" width="180" height="180" alt="OnebotLogo" class="round-image">
-      <span class="logo-text">什么都没有</span>
+      <img src="./res/logo.png" width="180" height="180" alt="OnebotLogo">
     </a>
   </div>
 </div>
@@ -73,18 +12,6 @@
 # nonebot-plugin-fakemsg
 
 _⭐基于`Nonebot2`的`onebot 11`的合并转发伪造消息插件⭐_
-
-
-<style>
-  .badge {
-    display: inline-block;
-    transition: transform 0.3s ease-in-out;
-  }
-  
-  .badge:hover {
-    transform: scale(1.1);
-  }
-</style>
 
 <a href="https://www.python.org/downloads/release/python-390/" class="badge">
 <img src="https://img.shields.io/badge/python-3.8+-blue">
@@ -166,7 +93,13 @@ git clone安装(不推荐)
 <details>
 <summary>使用效果图如下</summary>
 
-![效果图1]()
+> ** 指令如下
+
+![效果图1](./res/test_1.jpg)
+
+> ** 效果如下
+
+![效果图2](./res/test_2.jpg)
 
 </details>
 
@@ -182,3 +115,4 @@ git clone安装(不推荐)
 ## 💝 特别鸣谢
 
 - [x] [Nonebot](https://github.com/nonebot/nonebot2): 本项目的基础，非常好用的聊天机器人框架。
+- [x] [Onebot](https://onebot.dev/): 统一的聊天机器人应用接口标准。简洁、通用、可扩展，只需使用一套标准即可为各种平台编写聊天机器人

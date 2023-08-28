@@ -16,6 +16,7 @@ __plugin_meta__ = PluginMetadata(
     description="伪造消息",
     usage="qq+说+内容|qq+说+内容",
     config=config,
+    type = "application",
     homepage="https://github.com/Cvandia/nonebot-plugin-fakemsg",
     supported_adapters={"~onebot.v11"},
     extra={
