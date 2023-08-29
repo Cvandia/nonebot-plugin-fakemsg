@@ -16,7 +16,7 @@ __plugin_meta__ = PluginMetadata(
     description="伪造消息",
     usage="qq+说+内容|qq+说+内容",
     config=config,
-    type = "application",
+    type="application",
     homepage="https://github.com/Cvandia/nonebot-plugin-fakemsg",
     supported_adapters={"~onebot.v11"},
     extra={
@@ -30,7 +30,8 @@ __plugin_meta__ = PluginMetadata(
     },
 )
 
-fake_split = config.fake_split
+user_split = config.user_split
+message_split = config.message_split
 
 send_fake_msg = on_regex(r"^(\d{6,10})说(.*)", flags=re.I, priority=5, block=False)
 
@@ -43,10 +44,13 @@ async def _(
 ):
     await send_fake_msg.send(f"正在伪造消息...")
     fake_msg_list = []
-    users_msgs = args.split(fake_split)
+    users_msgs = args.split(user_split)
     for user_msg in users_msgs:
-        qq = user_msg.split("说")[0]  # 以 ‘说’ 为分隔qq号和消息内容
-        msgs = user_msg.split("说")[1].split()
+        try:
+            qq = user_msg.split("说", 1)[0]  # 以 ‘说’ 为分隔qq号和消息内容
+            msgs = user_msg.split("说", 1)[1].split(message_split)  # 以空格为分隔消息内容和消息内容
+        except IndexError:
+            await send_fake_msg.finish("消息格式错误")
         try:
             res = await bot.get_stranger_info(user_id=qq)
         except Exception as e:
@@ -67,9 +71,15 @@ async def send_forward_msg(
 ) -> dict:
     """
     发送 forward 消息
-    :param bot: bot对象
-    :param event: 事件对象
-    :param msgs: 消息列表
+
+    > 参数：
+        - bot: Bot 对象
+        - event: MessageEvent 对象
+        - msgs: 消息列表
+
+    > 返回值：
+        - 成功：返回消息发送结果
+        - 失败：抛出异常
     """
 
     def to_json(msg):
