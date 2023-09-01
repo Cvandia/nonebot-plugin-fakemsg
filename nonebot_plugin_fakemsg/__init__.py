@@ -6,7 +6,7 @@ from nonebot.adapters.onebot.v11 import (
     PrivateMessageEvent,
 )
 import re
-from typing import List, Union
+from typing import List, Tuple, Union, Any
 from nonebot.plugin import on_message, PluginMetadata
 from .config import config
 
@@ -48,11 +48,11 @@ async def check_if_fakemsg(bot: Bot, event: MessageEvent) -> bool:
         - 是伪造消息：True
         - 不是伪造消息：False
     """
-    if event.original_message[0].type == "at":
-        if event.original_message[1].data["text"].strip().startswith("说"):
+    if event.original_message.index("at") == 0:
+        if event.original_message.extract_plain_text().startswith("说"):
             return True
-    elif event.original_message[0].type == "text":
-        if re.match(r"^\d{6,10}说", event.original_message[0].data["text"]):
+    elif event.original_message.index("text") == 0:
+        if re.match(r"^\d{6,10}说", event.original_message.extract_plain_text()):
             return True
     return False
 
@@ -83,28 +83,31 @@ async def _(bot: Bot, event: Union[PrivateMessageEvent, GroupMessageEvent]):
 async def send_forward_msg(
     bot: Bot,
     event: MessageEvent,
-    msgs: List[Message],
-) -> dict:
+    user_message: List[Tuple[str, str, Message], Any],
+):
     """
     发送 forward 消息
 
     > 参数：
         - bot: Bot 对象
         - event: MessageEvent 对象
-        - msgs: 消息列表
+        - user_message: 合并消息的用户信息列表
 
     > 返回值：
         - 成功：返回消息发送结果
         - 失败：抛出异常
     """
 
-    def to_json(msg):
+    def to_json(info: Tuple[str, str, Message]):
+        '''
+        将消息转换为 forward 消息的 json 格式
+        '''
         return {
             "type": "node",
-            "data": {"name": msg[0], "uin": msg[1], "content": msg[2]},
+            "data": {"name": info[0], "uin": info[1], "content": info[2]},
         }
 
-    messages = [to_json(msg) for msg in msgs]
+    messages = [to_json(info) for info in user_message]
     if isinstance(event, GroupMessageEvent):
         return await bot.call_api(
             "send_group_forward_msg", group_id=event.group_id, messages=messages
