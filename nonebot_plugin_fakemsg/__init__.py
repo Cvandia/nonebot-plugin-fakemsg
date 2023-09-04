@@ -48,13 +48,16 @@ async def check_if_fakemsg(bot: Bot, event: MessageEvent) -> bool:
         - 是伪造消息：True
         - 不是伪造消息：False
     """
-    if event.original_message.index("at") == 0:
-        if event.original_message.extract_plain_text().startswith("说"):
-            return True
-    elif event.original_message.index("text") == 0:
-        if re.match(r"^\d{6,10}说", event.original_message.extract_plain_text()):
-            return True
-    return False
+    try:
+        if event.original_message.index("at") == 0:
+            if event.original_message.extract_plain_text().startswith("说"):
+                return True
+        return False
+    except ValueError:
+        if event.original_message.index("text") == 0:
+            if re.match(r"^\d{6,10}说", event.original_message.extract_plain_text()):
+                return True
+        return False
 
 
 send_fake_msg = on_message(rule=check_if_fakemsg, priority=5, block=True)
@@ -71,9 +74,14 @@ async def _(bot: Bot, event: Union[PrivateMessageEvent, GroupMessageEvent]):
         if qq_msg.isdigit():
             qq = qq_msg
         else:
-            qq = re.match(r"^\[CQ:at,qq=(\d{6,10})\]", qq_msg).group(1)
+            matches = re.match(r"^\[CQ:at,qq=(\d{6,10})\]", qq_msg)
+            if matches:
+                qq = matches.group(1)
+            else:
+                qq = bot.self_id
+                await send_fake_msg.finish('无法正确识别at信息', at_sender = True)
         msgs = user_msg.split("说", 1)[1].split(message_split)
-        name = await bot.get_stranger_info(user_id=qq)
+        name = await bot.get_stranger_info(user_id = int(qq))
         name = name["nickname"]
         for msg in msgs:
             fake_msg_list.append((name, qq, Message(msg)))
@@ -83,7 +91,7 @@ async def _(bot: Bot, event: Union[PrivateMessageEvent, GroupMessageEvent]):
 async def send_forward_msg(
     bot: Bot,
     event: MessageEvent,
-    user_message: List[Tuple[str, str, Message], Any],
+    user_message: List[Tuple[str, str, Message]],
 ):
     """
     发送 forward 消息
@@ -99,9 +107,9 @@ async def send_forward_msg(
     """
 
     def to_json(info: Tuple[str, str, Message]):
-        '''
+        """
         将消息转换为 forward 消息的 json 格式
-        '''
+        """
         return {
             "type": "node",
             "data": {"name": info[0], "uin": info[1], "content": info[2]},
