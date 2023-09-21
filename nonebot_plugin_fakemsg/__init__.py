@@ -8,13 +8,13 @@ from nonebot.adapters.onebot.v11 import (
 import re
 from typing import List, Tuple, Union, Any
 from nonebot.plugin import on_message, PluginMetadata
-from .config import config
+from .config import Config, config
 
 __plugin_meta__ = PluginMetadata(
     name="消息伪造",
     description="伪造消息",
     usage="qq+说+内容|qq+说+内容",
-    config=config,
+    config=Config,
     type="application",
     homepage="https://github.com/Cvandia/nonebot-plugin-fakemsg",
     supported_adapters={"~onebot.v11"},
@@ -36,7 +36,9 @@ user_split = config.user_split
 message_split = config.message_split
 
 
-async def check_if_fakemsg(bot: Bot, event: MessageEvent) -> bool:
+async def check_if_fakemsg(
+    bot: Bot, event: Union[GroupMessageEvent, PrivateMessageEvent]
+) -> bool:
     """
     检查是否为伪造消息
 
@@ -48,16 +50,13 @@ async def check_if_fakemsg(bot: Bot, event: MessageEvent) -> bool:
         - 是伪造消息：True
         - 不是伪造消息：False
     """
-    try:
-        if event.original_message.index("at") == 0:
-            if event.original_message.extract_plain_text().startswith("说"):
-                return True
-        return False
-    except ValueError:
-        if event.original_message.index("text") == 0:
-            if re.match(r"^\d{6,10}说", event.original_message.extract_plain_text()):
-                return True
-        return False
+    if event.original_message[0].type == "at":
+        if event.original_message[1].data["text"].strip().startswith("说"):
+            return True
+    elif event.original_message[0].type == "text":
+        if re.match(r"^\d{6,10}说", event.original_message[0].data["text"]):
+            return True
+    return False
 
 
 send_fake_msg = on_message(rule=check_if_fakemsg, priority=5, block=True)
@@ -79,9 +78,9 @@ async def _(bot: Bot, event: Union[PrivateMessageEvent, GroupMessageEvent]):
                 qq = matches.group(1)
             else:
                 qq = bot.self_id
-                await send_fake_msg.finish('无法正确识别at信息', at_sender = True)
+                await send_fake_msg.finish("无法正确识别at信息", at_sender=True)
         msgs = user_msg.split("说", 1)[1].split(message_split)
-        name = await bot.get_stranger_info(user_id = int(qq))
+        name = await bot.get_stranger_info(user_id=int(qq))
         name = name["nickname"]
         for msg in msgs:
             fake_msg_list.append((name, qq, Message(msg)))
