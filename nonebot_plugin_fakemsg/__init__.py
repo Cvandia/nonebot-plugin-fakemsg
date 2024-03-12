@@ -5,7 +5,7 @@ from nonebot.adapters.onebot.v11 import (
     GroupMessageEvent,
     PrivateMessageEvent,
 )
-import re
+import re, httpx
 from typing import List, Tuple, Union, Any
 from nonebot.plugin import on_message, PluginMetadata
 from .config import Config, config
@@ -80,8 +80,13 @@ async def _(bot: Bot, event: Union[PrivateMessageEvent, GroupMessageEvent]):
                 qq = bot.self_id
                 await send_fake_msg.finish("无法正确识别at信息", at_sender=True)
         msgs = user_msg.split("说", 1)[1].split(message_split)
-        name = await bot.get_stranger_info(user_id=int(qq))
-        name = name["nickname"]
+        try:
+            name = await bot.get_stranger_info(user_id=int(qq))
+            name = name["nickname"]
+        except:
+            res = httpx.get("https://api.usuuu.com/qq/{}".format(qq))
+            data = res.json()
+            name = data.get("data").get("name")
         for msg in msgs:
             fake_msg_list.append((name, qq, Message(msg)))
     await send_forward_msg(bot, event, fake_msg_list)
