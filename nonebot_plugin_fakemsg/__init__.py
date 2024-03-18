@@ -1,13 +1,16 @@
+import re
+from typing import Any, List, Tuple, Union
+
+import httpx
 from nonebot.adapters.onebot.v11 import (
-    Message,
-    MessageEvent,
     Bot,
     GroupMessageEvent,
+    Message,
+    MessageEvent,
     PrivateMessageEvent,
 )
-import re, httpx
-from typing import List, Tuple, Union, Any
-from nonebot.plugin import on_message, PluginMetadata
+from nonebot.plugin import PluginMetadata, on_message
+
 from .config import Config, config
 
 __plugin_meta__ = PluginMetadata(
