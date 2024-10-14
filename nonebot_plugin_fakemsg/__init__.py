@@ -1,7 +1,6 @@
 import re
-from typing import Any, List, Tuple, Union
+from typing import List, Tuple, Union
 
-import httpx
 from nonebot.adapters.onebot.v11 import (
     Bot,
     GroupMessageEvent,
@@ -40,7 +39,7 @@ message_split = config.message_split
 
 
 async def check_if_fakemsg(
-    bot: Bot, event: Union[GroupMessageEvent, PrivateMessageEvent]
+    event: Union[GroupMessageEvent, PrivateMessageEvent]
 ) -> bool:
     """
     检查是否为伪造消息
@@ -68,31 +67,40 @@ send_fake_msg = on_message(rule=check_if_fakemsg, priority=5, block=True)
 @send_fake_msg.handle()
 async def _(bot: Bot, event: Union[PrivateMessageEvent, GroupMessageEvent]):
     await send_fake_msg.send("正在伪造消息……")
-    raw_message = event.raw_message
-    fake_msg_list = []
-    user_msgs = raw_message.split(user_split)
-    for user_msg in user_msgs:
-        qq_msg = user_msg.split("说", 1)[0].strip()
-        if qq_msg.isdigit():
-            qq = qq_msg
-        else:
-            matches = re.match(r"^\[CQ:at,qq=(\d{6,10})\]", qq_msg)
-            if matches:
-                qq = matches.group(1)
+    fetched_message = event.original_message
+    fake_msg_list = []  # 创建伪造消息列表
+    at_qq_message = fetched_message["at"]  # 获取at的qq号
+    text_messgae = fetched_message["text"]  # 获取文本消息
+    user_index = 0
+    for text in text_messgae:
+        raw_text: str = text.data["text"]
+        user_msgs = raw_text.split(user_split)
+        for user_msg in user_msgs:
+            user_msg = user_msg.strip() # 去除空格
+            if user_msg.startswith("说"):
+                user_msg = user_msg.split("说")[1]
+                user_qq = at_qq_message[user_index].data["qq"]
+                user_info = await bot.get_stranger_info(user_id=int(user_qq))
+                user_name = user_info["nickname"]
+                user_index += 1
+                for msg in user_msg.split(message_split):
+                    fake_msg_list.append((user_name, user_qq, msg))
+            elif user_msg != '' and user_msg != ' ':
+                try:
+                    user_qq = user_msg.split("说")[0]
+                    user_msg = user_msg.split("说")[1]
+                except IndexError:
+                    await send_fake_msg.finish("消息格式错误,缺少“说”。")
+                user_info = await bot.get_stranger_info(user_id=int(user_qq))
+                user_name = user_info["nickname"]
+                for msg in user_msg.split(message_split):
+                    fake_msg_list.append((user_name, user_qq, msg))
             else:
-                qq = bot.self_id
-                await send_fake_msg.finish("无法正确识别at信息", at_sender=True)
-        msgs = user_msg.split("说", 1)[1].split(message_split)
-        try:
-            name = await bot.get_stranger_info(user_id=int(qq))
-            name = name["nickname"]
-        except:
-            res = httpx.get("https://api.usuuu.com/qq/{}".format(qq))
-            data = res.json()
-            name = data.get("data").get("name")
-        for msg in msgs:
-            fake_msg_list.append((name, qq, Message(msg)))
-    await send_forward_msg(bot, event, fake_msg_list)
+                continue
+    try:
+        await send_forward_msg(bot, event, fake_msg_list)
+    except Exception as e:
+        await send_fake_msg.finish(f"发送失败,{e}")
 
 
 async def send_forward_msg(
@@ -124,10 +132,10 @@ async def send_forward_msg(
 
     messages = [to_json(info) for info in user_message]
     if isinstance(event, GroupMessageEvent):
-        return await bot.call_api(
+        await bot.call_api(
             "send_group_forward_msg", group_id=event.group_id, messages=messages
         )
     else:
-        return await bot.call_api(
+        await bot.call_api(
             "send_private_forward_msg", user_id=event.user_id, messages=messages
         )
