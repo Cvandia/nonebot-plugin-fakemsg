@@ -32,7 +32,12 @@ _⭐基于`Nonebot2`的`onebot 11`的合并转发伪造消息插件⭐_
 
 ## ⭐ 介绍
 
-> 什么？你也想让你朋友出糗？！来试试伪造他的消息吧
+<div align="center">  
+
+## 目前仅支持文字格式消息伪造
+</div>
+
+> 什么？你也想让你朋友出糗？！来试试伪造他的消息吧，
 
 
 
@@ -109,8 +114,10 @@ git clone安装(不推荐)
 **注意**
 > 指令触发方式是`on_message`的，不需要加指令前缀
 
-## 🌙 未来
- - [ ] 添加`消息分段式`的伪造消息
+## 🌙 目前以及未来
+ - [x] 支持[go-cqhttp](https://github.com/Mrs4s/go-cqhttp)伪造消息
+ - [x] 支持[Lagrange.core](https://github.com/LagrangeDev/Lagrange.Core)伪造消息
+ - [ ] 支持`图片,卡片`等格式消息
 
 <div align="center">
 
