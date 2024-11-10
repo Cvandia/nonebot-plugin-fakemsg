@@ -78,7 +78,7 @@ async def _(bot: Bot, event: Union[PrivateMessageEvent, GroupMessageEvent]):
         for user_msg in user_msgs:
             user_msg = user_msg.strip()  # 去除空格
             if user_msg.startswith("说"):
-                user_msg = user_msg.split("说")[1]
+                user_msg = user_msg.split("说", 1)[1]
                 user_qq = at_qq_message[user_index].data["qq"]
                 user_info = await bot.get_stranger_info(user_id=int(user_qq))
                 user_name = user_info["nickname"]
@@ -87,8 +87,8 @@ async def _(bot: Bot, event: Union[PrivateMessageEvent, GroupMessageEvent]):
                     fake_msg_list.append((user_name, user_qq, msg))
             elif user_msg != "" and user_msg != " ":
                 try:
-                    user_qq = user_msg.split("说")[0]
-                    user_msg = user_msg.split("说")[1]
+                    user_qq = user_msg.split("说", 1)[0]
+                    user_msg = user_msg.split("说", 1)[1]
                 except IndexError:
                     await send_fake_msg.finish("消息格式错误,缺少“说”。")
                 user_info = await bot.get_stranger_info(user_id=int(user_qq))

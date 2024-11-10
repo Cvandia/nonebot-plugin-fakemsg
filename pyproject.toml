@@ -1,19 +1,25 @@
-[tool.poetry]
-name = "nonebot-plugin-fakemsg"
-version = "0.1.6"
-description = "适用于onebot的伪消息插件"
-authors = ["Cvandia <106718176+Cvandia@users.noreply.github.com>"]
-license = "MIT"
-readme = "README.md"
-packages = [{ include = "nonebot_plugin_fakemsg" }]
+[tool.pdm]
+distribution = true
 
-[tool.poetry.dependencies]
-nonebot-adapter-onebot = ">=2.0.0-beta.1"
-python = ">=3.8,<4"
-nonebot2 = ">=2.0.0-beta.1"
-pydantic = ">=1.10.2"
-
-
+[tool.pdm.build]
+includes = ["nonebot_plugin_fakemsg"]
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+
+[project]
+name = "nonebot-plugin-fakemsg"
+version = "0.1.7"
+description = "适用于onebot的伪消息插件"
+authors = [
+    {name = "Cvandia",email = "106718176+Cvandia@users.noreply.github.com"},
+]
+dependencies = [
+    "nonebot-adapter-onebot>=2.0.0-beta.1",
+    "nonebot2>=2.0.0-beta.1",
+]
+requires-python = "<4,>=3.8"
+readme = "README.md"
+license = {text = "MIT"}
+
