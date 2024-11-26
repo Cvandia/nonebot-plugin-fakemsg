@@ -52,11 +52,11 @@ async def check_if_fakemsg(
         - 是伪造消息：True
         - 不是伪造消息：False
     """
-    if event.original_message[0].type == "at":
-        if event.original_message[1].data["text"].strip().startswith("说"):
+    if len(event.original_message) > 1 and event.original_message[0].type == "at":
+        if event.original_message[1].data.get("text").strip().startswith("说"):
             return True
     elif event.original_message[0].type == "text":
-        if re.match(r"^\d{6,10}说", event.original_message[0].data["text"]):
+        if re.match(r"^\d{6,10}说", event.original_message[0].data.get("text")):
             return True
     return False
 
