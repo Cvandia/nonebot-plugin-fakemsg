@@ -1,9 +1,9 @@
 name: Publish package to PyPI
   
-on:  
-  push:  
-    tags:  
-      - 'v*' # 匹配"v1.0.0"、"v1.0.0-alpha"等发布标签
+on:
+  push:
+    paths:
+      - 'pyproject.toml'
   
 permissions:  
   contents: write  # 如果您的包发布到 GitHub Packages，则需要此权限  
