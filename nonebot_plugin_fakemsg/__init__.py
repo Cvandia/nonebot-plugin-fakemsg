@@ -39,7 +39,7 @@ message_split = config.message_split
 
 
 async def check_if_fakemsg(
-    event: Union[GroupMessageEvent, PrivateMessageEvent]
+    event: Union[GroupMessageEvent, PrivateMessageEvent],
 ) -> bool:
     """
     检查是否为伪造消息
