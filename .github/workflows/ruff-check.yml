@@ -1,0 +1,22 @@
+name: Ruff Lint
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths:
+      - nonebot_plugin_fakemsg/**
+      - pyproject.toml
+
+jobs:
+  ruff:
+    name: Ruff Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Ruff
+        uses: chartboost/ruff-action@v1
+        with:
+          version: 0.7.0
