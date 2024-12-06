@@ -1,5 +1,5 @@
 import re
-from typing import List, Tuple, Union
+from typing import Union
 
 from nonebot.adapters.onebot.v11 import (
     Bot,
@@ -55,9 +55,10 @@ async def check_if_fakemsg(
     if len(event.original_message) > 1 and event.original_message[0].type == "at":
         if event.original_message[1].data.get("text").strip().startswith("说"):
             return True
-    elif event.original_message[0].type == "text":
-        if re.match(r"^\d{6,10}说", event.original_message[0].data.get("text")):
-            return True
+    elif event.original_message[0].type == "text" and re.match(
+        r"^\d{6,10}说", event.original_message[0].data.get("text")
+    ):
+        return True
     return False
 
 
@@ -75,17 +76,18 @@ async def _(bot: Bot, event: Union[PrivateMessageEvent, GroupMessageEvent]):
     for text in text_messgae:
         raw_text: str = text.data["text"]
         user_msgs = raw_text.split(user_split)
-        for user_msg in user_msgs:
-            user_msg = user_msg.strip()  # 去除空格
+        for raw_user_msg in user_msgs:
+            user_msg = raw_user_msg.strip()  # 去除空格
             if user_msg.startswith("说"):
                 user_msg = user_msg.split("说", 1)[1]
                 user_qq = at_qq_message[user_index].data["qq"]
                 user_info = await bot.get_stranger_info(user_id=int(user_qq))
                 user_name = user_info["nickname"]
                 user_index += 1
-                for msg in user_msg.split(message_split):
-                    fake_msg_list.append((user_name, user_qq, msg))
-            elif user_msg != "" and user_msg != " ":
+                fake_msg_list.extend(
+                    (user_name, user_qq, msg) for msg in user_msg.split(message_split)
+                )
+            elif user_msg not in {"", " "}:
                 try:
                     user_qq = user_msg.split("说", 1)[0]
                     user_msg = user_msg.split("说", 1)[1]
@@ -93,8 +95,9 @@ async def _(bot: Bot, event: Union[PrivateMessageEvent, GroupMessageEvent]):
                     await send_fake_msg.finish("消息格式错误,缺少“说”。")
                 user_info = await bot.get_stranger_info(user_id=int(user_qq))
                 user_name = user_info["nickname"]
-                for msg in user_msg.split(message_split):
-                    fake_msg_list.append((user_name, user_qq, msg))
+                fake_msg_list.extend(
+                    (user_name, user_qq, msg) for msg in user_msg.split(message_split)
+                )
             else:
                 continue
     try:
@@ -106,7 +109,7 @@ async def _(bot: Bot, event: Union[PrivateMessageEvent, GroupMessageEvent]):
 async def send_forward_msg(
     bot: Bot,
     event: MessageEvent,
-    user_message: List[Tuple[str, str, Message]],
+    user_message: list[tuple[str, str, Message]],
 ):
     """
     发送 forward 消息
@@ -121,7 +124,7 @@ async def send_forward_msg(
         - 失败：抛出异常
     """
 
-    def to_json(info: Tuple[str, str, Message]):
+    def to_json(info: tuple[str, str, Message]):
         """
         将消息转换为 forward 消息的 json 格式
         """
