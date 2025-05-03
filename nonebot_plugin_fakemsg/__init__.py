@@ -8,7 +8,7 @@ from nonebot.adapters.onebot.v11 import (
     MessageEvent,
     PrivateMessageEvent,
 )
-from nonebot.plugin import PluginMetadata, on_message, get_driver
+from nonebot.plugin import PluginMetadata, get_driver, on_message
 
 from .config import Config, config
 
@@ -54,11 +54,15 @@ user_split = config.user_split
 message_split = config.message_split
 
 
-async def check_if_fakemsg(event: Union[GroupMessageEvent, PrivateMessageEvent]) -> bool:
+async def check_if_fakemsg(
+    event: Union[GroupMessageEvent, PrivateMessageEvent],
+) -> bool:
     if len(event.original_message) > 1 and event.original_message[0].type == "at":
         if event.original_message[1].data.get("text").strip().startswith("说"):
             return True
-    elif event.original_message[0].type == "text" and re.match(r"^\d{6,10}说", event.original_message[0].data.get("text")):
+    elif event.original_message[0].type == "text" and re.match(
+        r"^\d{6,10}说", event.original_message[0].data.get("text")
+    ):
         return True
     return False
 
@@ -140,6 +144,10 @@ async def send_forward_msg(
     messages = [to_json(info) for info in user_message]
 
     if isinstance(event, GroupMessageEvent):
-        await bot.call_api("send_group_forward_msg", group_id=event.group_id, messages=messages)
+        await bot.call_api(
+            "send_group_forward_msg", group_id=event.group_id, messages=messages
+        )
     else:
-        await bot.call_api("send_private_forward_msg", user_id=event.user_id, messages=messages)
+        await bot.call_api(
+            "send_private_forward_msg", user_id=event.user_id, messages=messages
+        )
