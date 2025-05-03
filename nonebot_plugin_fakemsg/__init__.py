@@ -8,7 +8,7 @@ from nonebot.adapters.onebot.v11 import (
     MessageEvent,
     PrivateMessageEvent,
 )
-from nonebot.plugin import PluginMetadata, on_message
+from nonebot.plugin import PluginMetadata, on_message, get_driver
 
 from .config import Config, config
 
@@ -27,37 +27,38 @@ __plugin_meta__ = PluginMetadata(
                 "trigger_method": "on_message",
                 "trigger_condition": "暂无介绍",
                 "brief_des": "用于伪造恶搞群友或者好友的消息",
-                "detail_des": "可使用的命令：\nqq+说+内容|qq+说+内容\n\n例如：\n123456说你好|654321说你好\n\n注意：\n1. 伪造消息的qq号必须是机器人好友或者在群内\n2. 伪造消息的qq号必须是数字\n3. 伪造消息的qq号必须是6-10位\n4. 伪造消息的内容不能包含|和说\n5. 伪造消息的内容不能超过30个字符\n6. 伪造消息的内容不能包含特殊字符\n7. 伪造消息的内容不能包含CQ码\n8. 伪造消息的内容不能包含空格\n9. 伪造消息的内容不能包含换行符\n10. 伪造消息的内容不能包含回车符\n11. 伪造消息的内容不能包含@",
+                "detail_des": (
+                    "可使用的命令：\nqq+说+内容|qq+说+内容\n\n例如：\n123456说你好|654321说你好\n\n注意：\n"
+                    "1. 伪造消息的qq号必须是机器人好友或者在群内\n"
+                    "2. 伪造消息的qq号必须是数字\n"
+                    "3. 伪造消息的qq号必须是6-10位\n"
+                    "4. 伪造消息的内容不能包含|和说\n"
+                    "5. 伪造消息的内容不能超过30个字符\n"
+                    "6. 伪造消息的内容不能包含特殊字符\n"
+                    "7. 伪造消息的内容不能包含CQ码\n"
+                    "8. 伪造消息的内容不能包含空格\n"
+                    "9. 伪造消息的内容不能包含换行符\n"
+                    "10. 伪造消息的内容不能包含回车符\n"
+                    "11. 伪造消息的内容不能包含@",
+                ),
             }
         ],
         "menu_template": "default",
     },
 )
 
+driver = get_driver()
+superusers = driver.config.superusers
+whitelist = set(config.fakemsg_whitelist)
 user_split = config.user_split
 message_split = config.message_split
 
 
-async def check_if_fakemsg(
-    event: Union[GroupMessageEvent, PrivateMessageEvent],
-) -> bool:
-    """
-    检查是否为伪造消息
-
-    > 参数：
-        - bot: Bot 对象
-        - event: MessageEvent 对象
-
-    > 返回值：
-        - 是伪造消息：True
-        - 不是伪造消息：False
-    """
+async def check_if_fakemsg(event: Union[GroupMessageEvent, PrivateMessageEvent]) -> bool:
     if len(event.original_message) > 1 and event.original_message[0].type == "at":
         if event.original_message[1].data.get("text").strip().startswith("说"):
             return True
-    elif event.original_message[0].type == "text" and re.match(
-        r"^\d{6,10}说", event.original_message[0].data.get("text")
-    ):
+    elif event.original_message[0].type == "text" and re.match(r"^\d{6,10}说", event.original_message[0].data.get("text")):
         return True
     return False
 
@@ -71,9 +72,10 @@ async def _(bot: Bot, event: Union[PrivateMessageEvent, GroupMessageEvent]):
     fetched_message = event.original_message
     fake_msg_list = []  # 创建伪造消息列表
     at_qq_message = fetched_message["at"]  # 获取at的qq号
-    text_messgae = fetched_message["text"]  # 获取文本消息
+    text_message = fetched_message["text"]  # 获取文本消息
     user_index = 0
-    for text in text_messgae:
+
+    for text in text_message:
         raw_text: str = text.data["text"]
         user_msgs = raw_text.split(user_split)
         for raw_user_msg in user_msgs:
@@ -84,22 +86,24 @@ async def _(bot: Bot, event: Union[PrivateMessageEvent, GroupMessageEvent]):
                 user_info = await bot.get_stranger_info(user_id=int(user_qq))
                 user_name = user_info["nickname"]
                 user_index += 1
-                fake_msg_list.extend(
-                    (user_name, user_qq, msg) for msg in user_msg.split(message_split)
-                )
             elif user_msg not in {"", " "}:
                 try:
-                    user_qq = user_msg.split("说", 1)[0]
-                    user_msg = user_msg.split("说", 1)[1]
-                except IndexError:
-                    await send_fake_msg.finish("消息格式错误,缺少“说”。")
-                user_info = await bot.get_stranger_info(user_id=int(user_qq))
-                user_name = user_info["nickname"]
-                fake_msg_list.extend(
-                    (user_name, user_qq, msg) for msg in user_msg.split(message_split)
-                )
+                    user_qq, user_msg = user_msg.split("说", 1)
+                except ValueError:
+                    await send_fake_msg.finish("消息格式错误，缺少“说”。")
             else:
                 continue
+
+            # 白名单检测
+            if user_qq in whitelist and str(event.user_id) not in superusers:
+                await send_fake_msg.finish(f"你没有权限伪造该用户（{user_qq}）的消息。")
+
+            user_info = await bot.get_stranger_info(user_id=int(user_qq))
+            user_name = user_info["nickname"]
+            fake_msg_list.extend(
+                (user_name, user_qq, msg) for msg in user_msg.split(message_split)
+            )
+
     try:
         await send_forward_msg(bot, event, fake_msg_list)
     except Exception as e:
@@ -134,11 +138,8 @@ async def send_forward_msg(
         }
 
     messages = [to_json(info) for info in user_message]
+
     if isinstance(event, GroupMessageEvent):
-        await bot.call_api(
-            "send_group_forward_msg", group_id=event.group_id, messages=messages
-        )
+        await bot.call_api("send_group_forward_msg", group_id=event.group_id, messages=messages)
     else:
-        await bot.call_api(
-            "send_private_forward_msg", user_id=event.user_id, messages=messages
-        )
+        await bot.call_api("send_private_forward_msg", user_id=event.user_id, messages=messages)
