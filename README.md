@@ -90,10 +90,11 @@ git clone安装(不推荐)
 ## ⚙️ 配置
 ### 在env.中添加以下配置
 
-|     配置      | 类型  | 默认值 |             说明             |
-| :-----------: | :---: | :----: | :--------------------------: |
-|  user_split   |  str  |  '\|'  |    不同人伪造消息的分隔符    |
-| message_split |  str  |  空格  | 用于分隔同一个人的消息分隔符 |
+|       配置        | 类型  | 默认值 |                     说明                     |
+| :---------------: | :---: | :----: | :------------------------------------------: |
+|    user_split     |  str  |  "|"   |            不同人伪造消息的分隔符            |
+|   message_split   |  str  |  空格  |         用于分隔同一个人的消息分隔符         |
+| fakesmg_whitelist |  str  |   无   | 无法用于消息伪造的账号（SUPERUSERS不受限制） |
 
 ## ⭐ 使用
 <details>
@@ -106,6 +107,10 @@ git clone安装(不推荐)
 > 效果如下
 
 ![效果图2](./res/test_2.jpg)
+
+> 效果如下
+
+![效果图3](./res/test_3.jpg)
 
 **支持识别`@xxx`的消息,如`@群友1 说你好啊|@群友2 我很好！`**
 
@@ -120,11 +125,12 @@ git clone安装(不推荐)
  - [x] 支持[go-cqhttp](https://github.com/Mrs4s/go-cqhttp)伪造消息
  - [x] 支持[Lagrange.core](https://github.com/LagrangeDev/Lagrange.Core)伪造消息
  - [x] 支持[NapcatQQ](https://github.com/NapNeko/NapCatQQ)伪造消息
+ - [x] 支持`白名单`模式，仅SUPERUSERS可伪造位于白名单账号的消息，建议填入Bot本身和SUPERUSERS的账号
  - [ ] 支持`图片,卡片`等格式消息
 
 <div align="center">
 
-_喜欢记得点个[star](https://www.baidu.com)哦!⭐_
+_喜欢记得点个[star](https://github.com/Cvandia/nonebot-plugin-fakemsg)哦!⭐_
 
 </div>
 
