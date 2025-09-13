@@ -10,7 +10,7 @@ build-backend = "pdm.backend"
 
 [project]
 name = "nonebot-plugin-fakemsg"
-version = "0.1.8"
+version = "0.1.9"
 description = "适用于onebot的伪消息插件"
 authors = [
     {name = "Cvandia",email = "106718176+Cvandia@users.noreply.github.com"},
