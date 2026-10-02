@@ -58,7 +58,9 @@ async def check_if_fakemsg(
     event: Union[GroupMessageEvent, PrivateMessageEvent],
 ) -> bool:
     if len(event.original_message) > 1 and event.original_message[0].type == "at":
-        if (t := event.original_message[1].data.get("text")) and t.strip().startswith("说"):
+        if (t := event.original_message[1].data.get("text")) and t.strip().startswith(
+            "说"
+        ):
             return True
     elif event.original_message[0].type == "text" and re.match(
         r"^\d{6,10}说", event.original_message[0].data.get("text")
