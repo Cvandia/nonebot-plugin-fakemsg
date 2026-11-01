@@ -136,8 +136,8 @@ _喜欢记得点个[star](https://github.com/Cvandia/nonebot-plugin-fakemsg)哦!
 
 ### 感谢以下开发者
 
-<a href="https://github.com/Cvandia/astrbot_plugin_mohoyo_cos/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Cvandia/astrbot_plugin_mohoyo_cos&max=100" alt="contributors" />
+<a href="https://github.com/Cvandia/onebot-plugin-fakemsg/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Cvandia/onebot-plugin-fakemsg&max=100" alt="contributors" />
 </a>
 
 ## 💝 特别鸣谢
