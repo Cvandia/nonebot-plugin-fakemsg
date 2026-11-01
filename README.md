@@ -134,6 +134,12 @@ _喜欢记得点个[star](https://github.com/Cvandia/nonebot-plugin-fakemsg)哦!
 
 </div>
 
+### 感谢以下开发者
+
+<a href="https://github.com/Cvandia/astrbot_plugin_mohoyo_cos/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Cvandia/astrbot_plugin_mohoyo_cos&max=100" alt="contributors" />
+</a>
+
 ## 💝 特别鸣谢
 
 - [x] [Nonebot](https://github.com/nonebot/nonebot2): 本项目的基础，非常好用的聊天机器人框架。
