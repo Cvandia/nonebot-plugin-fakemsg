@@ -94,7 +94,7 @@ git clone安装(不推荐)
 | :---------------: | :---: | :----: | :------------------------------------------: |
 |    user_split     |  str  |  "|"   |            不同人伪造消息的分隔符            |
 |   message_split   |  str  |  空格  |         用于分隔同一个人的消息分隔符         |
-| fakesmg_whitelist |  str  |   无   | 无法用于消息伪造的账号（SUPERUSERS不受限制） |
+| fakemsg_whitelist |  str  |   无   | 无法用于消息伪造的账号（SUPERUSERS不受限制） |
 
 ## ⭐ 使用
 <details>
