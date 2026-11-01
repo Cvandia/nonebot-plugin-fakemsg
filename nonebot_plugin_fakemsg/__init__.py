@@ -58,7 +58,9 @@ async def check_if_fakemsg(
     event: Union[GroupMessageEvent, PrivateMessageEvent],
 ) -> bool:
     if len(event.original_message) > 1 and event.original_message[0].type == "at":
-        if event.original_message[1].data.get("text").strip().startswith("说"):
+        if (t := event.original_message[1].data.get("text")) and t.strip().startswith(
+            "说"
+        ):
             return True
     elif event.original_message[0].type == "text" and re.match(
         r"^\d{6,10}说", event.original_message[0].data.get("text")
@@ -85,10 +87,10 @@ async def _(bot: Bot, event: Union[PrivateMessageEvent, GroupMessageEvent]):
         for raw_user_msg in user_msgs:
             user_msg = raw_user_msg.strip()  # 去除空格
             if user_msg.startswith("说"):
+                if user_index >= len(at_qq_message):
+                    await send_fake_msg.finish("分段数量与 @ 数量不一致。")
                 user_msg = user_msg.split("说", 1)[1]
                 user_qq = at_qq_message[user_index].data["qq"]
-                user_info = await bot.get_stranger_info(user_id=int(user_qq))
-                user_name = user_info["nickname"]
                 user_index += 1
             elif user_msg not in {"", " "}:
                 try:
@@ -98,15 +100,17 @@ async def _(bot: Bot, event: Union[PrivateMessageEvent, GroupMessageEvent]):
             else:
                 continue
 
+            messages = [msg for msg in user_msg.split(message_split) if msg.strip()]
+            if not messages:
+                await send_fake_msg.finish("消息内容不能为空。")
+
             # 白名单检测
             if user_qq in whitelist and str(event.user_id) not in superusers:
                 await send_fake_msg.finish(f"你没有权限伪造该用户（{user_qq}）的消息。")
 
             user_info = await bot.get_stranger_info(user_id=int(user_qq))
             user_name = user_info["nickname"]
-            fake_msg_list.extend(
-                (user_name, user_qq, msg) for msg in user_msg.split(message_split)
-            )
+            fake_msg_list.extend((user_name, user_qq, msg) for msg in messages)
 
     try:
         await send_forward_msg(bot, event, fake_msg_list)
